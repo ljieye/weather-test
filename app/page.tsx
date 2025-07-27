@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface WeatherData {
   name: string;
@@ -69,7 +69,7 @@ export default function Home() {
   const [currentCity, setCurrentCity] = useState(popularCities[0]);
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  const fetchWeather = async (city: typeof popularCities[0]) => {
+  const fetchWeather = useCallback(async (city: typeof popularCities[0]) => {
     const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
     
     if (!apiKey) {
@@ -117,7 +117,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleCitySelect = (city: typeof popularCities[0]) => {
     setCurrentCity(city);
@@ -140,12 +140,12 @@ export default function Home() {
 
       return () => clearInterval(interval);
     }
-  }, [currentCity, autoRefresh]);
+  }, [currentCity, autoRefresh, fetchWeather]);
 
   // 初始加载
   useEffect(() => {
     fetchWeather(currentCity);
-  }, []);
+  }, [fetchWeather]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 p-4">
